@@ -34,8 +34,41 @@ Burner also supports backups. You can define a backup configuration in your burn
 
 ```ts
 const burner.backup = {
-  
+  name: 'Unstable Azure Server SGP',
+  id: 'sgp-1-unstable',
+  // exact path is needed
+  dirs: ['/etc/daemon/storage', '/var/lib/docker'],
+  // optional: specify a backup location (defaults to /backups)
+  localBackupDir: '/backups',
+  // optional: specify a remote backup location (defaults to /backups on the server)
+  remote: {
+    1: {
+        name: 'backup-us-east',
+        host: 'backup-us-east.example.com',
+        token: 'your-backup-token',
+    },
+    2: {
+        name: 'backup-eu-west',
+        host: 'backup-eu-west.example.com',
+        token: 'your-backup-token',
+    },
+  },
+  schedule: {
+    // cron expression for scheduling backups (e.g., "0 0 * * *" for daily at midnight)
+    cron: "0 0 * * *",
+    // or use a simple interval (e.g., "24h" for every 24 hours)
+    interval: "24h",
+  }
 }
 
 export default burner.backup;
 ```
+
+To restore from a backup do
+
+```bash
+burner backup list sgp-1-unstable --target <remote-name> --token <backup-remote-token>
+burner backup restore sgp-1-unstable --backup latest/get an id --target <remote-name> --token <backup-remote-token>
+```
+
+Here burner will slowly propgate files back into the server's file system. Be aware things like /<user>/ are found, burner will ask for your premission to propgate these. 
