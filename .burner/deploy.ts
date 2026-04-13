@@ -46,6 +46,7 @@ const burner = {
 
   // Script executed on the server before running the app
   // Typically used to install dependencies
+  // maybe packages in docker who knows?
   installScript: "",
 
   // Entry point command for starting the app on the server

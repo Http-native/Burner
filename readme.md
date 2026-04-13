@@ -72,3 +72,37 @@ burner backup restore sgp-1-unstable --backup latest/get an id --target <remote-
 ```
 
 Here burner will slowly propgate files back into the server's file system. Be aware things like /<user>/ are found, burner will ask for your premission to propgate these. 
+
+
+## Bruner patches.
+
+Ship delta changes, not the whole app. Burner can detect changes in your application and only deploy the changed files. This is especially useful for large applications where only a few files change between deployments.
+
+
+```ts
+export default {
+  ignore: ['node_modules', 'dist', '.env'],
+  // ship deltas instead of the whole app every time. This is much faster and more efficient.
+  // Note: This only works if there is a build step at the server.
+  // If not burner will instantly error out since we ain't js shipping bins
+  ship: 'delta', // or 'full' to ship the entire app every time
+  // Define a build step here.
+  build: {
+    local: {
+        command: "npm run build",
+        cwd: "./"
+    },
+    // Burner allows you to
+    // Build on the server aswell.
+    remote: {
+        command: "npm run build",
+        cwd: "./"
+    }
+  },
+  installScript: "apk add nodejs npm",
+  // The entry point of your application. 
+  // This is the command that will be executed
+  //  when you run the application on the server.
+  entrypoint: "node dist/index.js",
+}
+````
